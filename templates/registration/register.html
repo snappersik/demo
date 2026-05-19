@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Регистрация | Конференции РФ{% endblock %}
+{% block content %}
+<div class="container auth-page">
+  <section class="auth-card">
+    <p class="eyebrow">новый пользователь</p>
+    <h1>Регистрация</h1>
+    <form method="post" class="stacked-form required-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn btn-accent btn-lg w-100" type="submit">Зарегистрироваться</button>
+    </form>
+    <p class="auth-link">Уже есть аккаунт? <a href="{% url 'login' %}">Вернуться ко входу</a></p>
+  </section>
+</div>
+{% endblock %}

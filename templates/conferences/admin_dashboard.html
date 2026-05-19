@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Админ-панель | Конференции РФ
+{% endblock %}
+
+{% block content %}
+<div class="container page-stack">
+  <section class="admin-top">
+    <div>
+      <p class="eyebrow">администрирование</p>
+      <h1>Панель администратора</h1>
+      <p>Управление помещениями и заявками пользователей.</p>
+    </div>
+
+    <div class="admin-actions">
+      <a class="btn btn-accent" href="{% url 'create_room' %}">
+        Добавить помещение
+      </a>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">помещения</p>
+        <h2>Добавленные помещения</h2>
+      </div>
+    </div>
+
+    <div class="admin-room-grid">
+      {% for room in rooms %}
+        <article class="admin-room-card">
+          <img src="{{ room.image.url }}" alt="{{ room.name }}" width="1200" height="760">
+
+          <div>
+            <span class="room-type">{{ room.get_room_type_display }}</span>
+            <h3>{{ room.name }}</h3>
+            <p>{{ room.description }}</p>
+
+            <div class="admin-room-actions-visible">
+              <a class="btn btn-sm btn-outline-primary" href="{% url 'update_room' room.id %}">
+                Редактировать
+              </a>
+
+              <form method="post" action="{% url 'delete_room' room.id %}">
+                {% csrf_token %}
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  type="submit"
+                  onclick="return confirm('Вы точно хотите удалить это помещение?');"
+                >
+                  Удалить
+                </button>
+              </form>
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <div class="empty-state">
+          Помещения пока не добавлены. Нажмите кнопку «Добавить помещение».
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">заявки</p>
+        <h2>Заявки пользователей</h2>
+      </div>
+    </div>
+
+    <div class="filters-panel admin-filters" data-admin-filters>
+      <input class="form-control" data-admin-search placeholder="Поиск по помещению или ФИО пользователя">
+
+      <select class="form-select" data-admin-status>
+        <option value="">Все статусы</option>
+        {% for value, label in status_choices %}
+          <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+      </select>
+
+      <select class="form-select" data-admin-type>
+        <option value="">Все типы</option>
+        {% for value, label in room_types %}
+          <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+      </select>
+
+      <select class="form-select" data-admin-sort>
+        <option value="-created">новые сверху</option>
+        <option value="date">дата ↑</option>
+        <option value="-date">дата ↓</option>
+        <option value="status">статус</option>
+        <option value="room">помещение</option>
+      </select>
+    </div>
+
+    <div class="admin-application-list" data-admin-list>
+      {% for app in applications %}
+        <article class="admin-application-card"
+                 data-admin-app-row
+                 data-application-id="{{ app.id }}"
+                 data-search="{{ app.room.name }} {{ app.user.profile.full_name|default:app.user.username }} {{ app.user.email }}"
+                 data-status="{{ app.status }}"
+                 data-type="{{ app.room.room_type }}"
+                 data-created="{{ app.created_at|date:'U' }}"
+                 data-date="{{ app.conference_date|date:'Ymd' }}"
+                 data-room="{{ app.room.name }}">
+
+          <img src="{{ app.room.image.url }}" alt="{{ app.room.name }}" width="1200" height="760">
+
+          <div class="admin-app-body">
+            <div>
+              <h3>{{ app.room.name }}</h3>
+              <p>{{ app.user.profile.full_name|default:app.user.username }} · {{ app.user.email }}</p>
+              <p class="muted-text">
+                {{ app.conference_date|date:"d.m.Y" }} в {{ app.start_time|time:"H:i" }} · {{ app.get_payment_method_display }}
+              </p>
+            </div>
+
+            <select class="form-select status-select status-select-pill badge-{{ app.status }}">
+              {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if app.status == value %}selected{% endif %}>
+                  {{ label }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </article>
+      {% empty %}
+        <div class="empty-state">Заявки не найдены.</div>
+      {% endfor %}
+    </div>
+
+    <div class="empty-state d-none" data-admin-empty>
+      Заявки по выбранным условиям не найдены.
+    </div>
+
+    <nav class="pagination-row" data-admin-pagination aria-label="Навигация заявок"></nav>
+  </section>
+</div>
+{% endblock %}

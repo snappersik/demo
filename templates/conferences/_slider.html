@@ -1,0 +1,26 @@
+{% load static %}
+<section class="content-section slider-section {{ slider_variant|default:'slider-section-compact' }}">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">доступные помещения</p>
+      <h2>Площадки для конференций</h2>
+    </div>
+  </div>
+  <div class="conference-slider" data-slider>
+    {% for slide in slider_images %}
+      <article class="conference-slide{% if forloop.first %} is-active{% endif %}" data-slide>
+        <img src="{% static slide.src %}" alt="{{ slide.title }}" width="1200" height="760" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
+        <div class="slide-caption">{{ slide.title }}</div>
+      </article>
+    {% endfor %}
+    <button class="slider-button slider-button-prev" type="button" data-slider-prev aria-label="Предыдущий слайд">‹</button>
+    <button class="slider-button slider-button-next" type="button" data-slider-next aria-label="Следующий слайд">›</button>
+    <div class="slider-progress" aria-hidden="true">
+      {% for slide in slider_images %}
+        <button type="button" class="{% if forloop.first %}is-active{% endif %}" data-slider-dot aria-label="Слайд {{ forloop.counter }}">
+          <span></span>
+        </button>
+      {% endfor %}
+    </div>
+  </div>
+</section>

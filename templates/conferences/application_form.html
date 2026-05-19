@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Создать заявку | Конференции РФ{% endblock %}
+{% block content %}
+<div class="container narrow-page">
+  <div class="page-card">
+    <div class="page-actions">
+      <a class="btn btn-light" href="{% url 'my_applications' %}">Назад</a>
+    </div>
+    <p class="eyebrow">новая заявка</p>
+    <h1>Бронирование помещения</h1>
+    <p class="muted-text">Выберите помещение, дату, время начала конференции и удобный способ оплаты.</p>
+    <form method="post" class="stacked-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn btn-accent btn-lg w-100" type="submit">Отправить заявку</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Личный кабинет | Конференции РФ{% endblock %}
+{% block content %}
+<div class="container page-stack">
+  <section class="cabinet-hero">
+    <div>
+      <p class="eyebrow">личный кабинет</p>
+      <h1>История заявок</h1>
+      <p>Здесь отображаются созданные заявки, их текущие статусы и отзывы после завершения мероприятия.</p>
+    </div>
+    <a class="btn btn-accent" href="{% url 'create_application' %}">Новая заявка</a>
+  </section>
+
+  <section class="profile-summary">
+    <div>
+      <p class="eyebrow">мои данные</p>
+      <h2>{{ user.profile.full_name|default:user.username }}</h2>
+    </div>
+    <dl class="profile-grid">
+      <div>
+        <dt>Логин</dt>
+        <dd>{{ user.username }}</dd>
+      </div>
+      <div>
+        <dt>Телефон</dt>
+        <dd>{{ user.profile.phone|default:"не указан" }}</dd>
+      </div>
+      <div>
+        <dt>Email</dt>
+        <dd>{{ user.email|default:"не указан" }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="content-section">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">заявки</p>
+        <h2>Мои бронирования</h2>
+      </div>
+    </div>
+    <div class="application-list">
+      {% for app in applications %}
+        <article class="application-card">
+          <div class="application-room-image">
+            <img src="{{ app.room.image.url }}" alt="{{ app.room.name }}" width="1200" height="760">
+          </div>
+          <div class="application-card-main">
+            <div class="application-card-head">
+              <div>
+                <h3>{{ app.room.name }}</h3>
+                <p>{{ app.room.get_room_type_display }} · {{ app.conference_date|date:"d.m.Y" }} · {{ app.start_time|time:"H:i" }}</p>
+                <p class="muted-text">Оплата: {{ app.get_payment_method_display }}. Создана: {{ app.created_at|date:"d.m.Y H:i" }}</p>
+              </div>
+              <span class="status-badge badge-{{ app.status }}">{{ app.get_status_display }}</span>
+            </div>
+            {% if app.can_review %}
+              <form method="post" action="{% url 'create_review' app.id %}" class="review-form">
+                {% csrf_token %}
+                {{ review_form.as_p }}
+                <button class="btn btn-primary" type="submit">Оставить отзыв</button>
+              </form>
+            {% elif app.review %}
+              <div class="review-readonly">Ваш отзыв: {{ app.review.rating }}/5 — {{ app.review.text }}</div>
+            {% endif %}
+          </div>
+        </article>
+      {% empty %}
+        <div class="empty-state">Пока нет заявок. Создайте первую бронь для конференции.</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% include 'conferences/_slider.html' with slider_variant='slider-section-compact' %}
+</div>
+{% endblock %}

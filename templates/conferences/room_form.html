@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  {% if mode == 'edit' %}
+    Редактировать помещение | Конференции РФ
+  {% else %}
+    Добавить помещение | Конференции РФ
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container narrow-page">
+  <div class="page-card">
+    <div class="page-actions">
+      <a class="btn btn-light" href="{% url 'admin_dashboard' %}">
+        Назад в админ-панель
+      </a>
+    </div>
+
+    <p class="eyebrow">управление помещениями</p>
+
+    <h1>
+      {% if mode == 'edit' %}
+        Редактировать помещение
+      {% else %}
+        Добавить помещение
+      {% endif %}
+    </h1>
+
+    <p class="muted-text">
+      Заполните данные помещения. После сохранения оно будет отображаться в каталоге
+      и станет доступно пользователям для выбора при создании заявки.
+    </p>
+
+    {% if room and room.image %}
+      <img
+        src="{{ room.image.url }}"
+        alt="{{ room.name }}"
+        class="form-preview-image"
+      >
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="stacked-form required-form">
+      {% csrf_token %}
+
+      {{ form.as_p }}
+
+      <button class="btn btn-accent btn-lg w-100" type="submit">
+        {% if mode == 'edit' %}
+          Сохранить изменения
+        {% else %}
+          Добавить помещение
+        {% endif %}
+      </button>
+    </form>
+
+    {% if mode == 'edit' and room %}
+      <div class="room-delete-box">
+        <h2>Удаление помещения</h2>
+        <p class="muted-text">
+          Если помещение больше не используется, администратор может удалить его.
+          Если к помещению уже привязаны заявки, лучше не удалять его из базы.
+        </p>
+
+        <form method="post" action="{% url 'delete_room' room.id %}">
+          {% csrf_token %}
+          <button
+            class="btn btn-outline-danger w-100"
+            type="submit"
+            onclick="return confirm('Вы точно хотите удалить это помещение?');"
+          >
+            Удалить помещение
+          </button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
