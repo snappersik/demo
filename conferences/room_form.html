@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  Добавить помещение | Конференции РФ
+{% endblock %}
+
+{% block content %}
+<div class="container narrow-page">
+  <div class="page-card">
+    <div class="page-actions">
+      <a class="btn btn-light" href="{% url 'admin_dashboard' %}">
+        Назад в админ-панель
+      </a>
+    </div>
+
+    <p class="eyebrow">управление помещениями</p>
+    <h1>Добавить помещение</h1>
+
+    <p class="muted-text">
+      Заполните данные помещения. После сохранения оно появится в каталоге
+      и станет доступно пользователям для выбора при создании заявки.
+    </p>
+
+    <form method="post" enctype="multipart/form-data" class="stacked-form required-form">
+      {% csrf_token %}
+
+      {{ form.as_p }}
+
+      <button class="btn btn-accent btn-lg w-100" type="submit">
+        Добавить помещение
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Конференции РФ{% endblock %}
+{% block content %}
+<section class="hero" style="background-image: url('{% static 'img/auditorium2.jpg' %}');">
+  <div class="hero-overlay"></div>
+  <div class="container hero-content">
+    <p class="eyebrow">Всероссийские мероприятия</p>
+    <h1>Конференции РФ</h1>
+    <p>Бронирование аудиторий, коворкингов и кинозалов для деловых встреч, секций и крупных презентаций.</p>
+    <div class="hero-actions">
+      <a class="btn btn-accent btn-lg" href="{% if user.is_authenticated and not user.is_staff %}{% url 'create_application' %}{% elif user.is_staff %}{% url 'admin_dashboard' %}{% else %}{% url 'login' %}{% endif %}">Создать заявку</a>
+      <a class="btn btn-outline-light btn-lg" href="#rooms" data-smoky-scroll>Каталог помещений</a>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  {% include 'conferences/_slider.html' with slider_variant='slider-section-wide' %}
+
+  <section class="content-section" id="rooms">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">каталог</p>
+        <h2>Доступные помещения</h2>
+      </div>
+    </div>
+
+    <div class="room-grid" data-room-grid>
+      {% for room in rooms %}
+      <article class="room-card"
+                 data-room-card
+                 data-type="{{ room.room_type }}">
+          <img src="{{ room.image.url }}" alt="{{ room.name }}" width="1200" height="760" loading="lazy">
+          <div class="room-card-body">
+            <span class="room-type">{{ room.get_room_type_display }}</span>
+            <h3>{{ room.name }}</h3>
+            <p>{{ room.description }}</p>
+            <a class="btn btn-accent w-100" href="{% if user.is_authenticated and not user.is_staff %}{% url 'create_application' %}?room={{ room.id }}{% elif user.is_staff %}{% url 'admin_dashboard' %}{% else %}{% url 'login' %}{% endif %}">Забронировать</a>
+          </div>
+        </article>
+      {% empty %}
+        <div class="empty-state">Помещения пока не добавлены.</div>
+      {% endfor %}
+    </div>
+    {# <div class="empty-state d-none" data-catalog-empty>Помещения по выбранным условиям не найдены.</div> #}
+  </section>
+
+</div>
+{% endblock %}
